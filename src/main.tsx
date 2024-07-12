@@ -9,7 +9,7 @@ import AppProvider from './contexts/app.context.tsx'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // refetchOnWindowFocus: false
+      refetchOnWindowFocus: false
     }
   }
 })
@@ -18,9 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <AppProvider>
-          <App />
-        </AppProvider>
+        {/* <AppProvider> */}
+        <App />
+        {/* </AppProvider> */}
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,
