@@ -2,7 +2,7 @@
 
 const Head = () => {
     return (
-        <div className="">Head</div>
+        <div className="text-white text-center">TODOLIST</div>
     )
 }
 

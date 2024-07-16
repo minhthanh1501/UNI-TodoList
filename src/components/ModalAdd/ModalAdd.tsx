@@ -18,6 +18,7 @@ const ModalAdd = ({ title, open, onOk, confirmLoading, onCancel }: any) => {
 
     const handleOk = () => {
         form.submit();
+        form.setFieldsValue({ name: "" })
     };
 
     const onFinish = (value: Todo) => {

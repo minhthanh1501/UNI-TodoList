@@ -17,9 +17,10 @@ function App() {
       <ConfigProvider
         theme={{
           token: {
-            colorBgBase: "#36C2CE",
-            colorBgContainer: "#77E4C8",
-            borderRadius: 10
+            colorBgBase: "#405D72",
+            colorBgContainer: "#758694",
+            borderRadius: 10,
+            colorTextTertiary: "red",
           }
         }}
       >

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, List, Skeleton, Typography, Modal } from 'antd';
+import { Button, List, Skeleton, Typography, } from 'antd';
 import { Todo } from '../../@types/Todo.type';
-import { useMutation, useQuery } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import * as apis from "../../utils/axios/"
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import ModalAdd from '../ModalAdd';
@@ -13,29 +13,36 @@ const { Title } = Typography;
 const ListTodos = () => {
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [list, setList] = useState<Todo[]>([]);
-    const [page, setPage] = useState<number>(1)
+    const [list, setList] = useState<Todo[]>([])
 
-    const { refetch } = useQuery({
+    const loadMoreQuery = useInfiniteQuery({
         queryKey: ['todos'],
-        queryFn: () => {
-            return apis.apiGetListTodos({ _page: page, _per_page: 20 })
-        },
-        onSuccess: (result) => {
-            setList(result.data)
-            setInitLoading(false);
-        }
+        queryFn: ({ pageParam = 1 }) => apis.apiGetListTodos({ _page: pageParam, _per_page: 3 }),
+        getNextPageParam: (lastPage, allPages) => lastPage.next ?? false,
+        // getPreviousPageParam: (firstPage, allPages) => firstPage.prev ?? false,
     })
 
+    useEffect(() => {
+        if (loadMoreQuery.data?.pages) {
+            // Ghép các trang lại với nhau
+            const newList = loadMoreQuery.data.pages.flatMap(page => page.data);
+            setList(newList);
+        }
+        setLoading(false)
+        setInitLoading(false)
+
+    }, [loadMoreQuery.data])
+
     const onLoadMore = () => {
-        setPage((prev) => prev + 1)
-        console.log(page)
-        // setLoading(true);
-        refetch()
+        setLoading(true)
+        setTimeout(() => {
+            loadMoreQuery.fetchNextPage();
+            setLoading(false)
+        }, 1000)
     };
 
     const loadMore =
-        !initLoading && !loading ? (
+        loadMoreQuery.hasNextPage ? (
             <div
                 style={{
                     textAlign: 'center',
@@ -44,7 +51,7 @@ const ListTodos = () => {
                     lineHeight: '32px',
                 }}
             >
-                <Button onClick={onLoadMore}>loading more</Button>
+                <Button onClick={onLoadMore} disabled={loadMoreQuery.isFetchingNextPage} loading={loading}>loading more</Button>
             </div>
         ) : null;
 
@@ -67,7 +74,6 @@ const ListTodos = () => {
     };
 
     const handleCancel = () => {
-        console.log('Clicked cancel button');
         setOpen(false);
     };
 
@@ -136,7 +142,6 @@ const ListTodos = () => {
                         TodoList
                     </Title>
                     <List
-
                         style={{
                             backgroundColor: "#478CCF",
                             minWidth: "500px",
@@ -161,8 +166,8 @@ const ListTodos = () => {
                                 <Skeleton loading={false} active>
                                     <List.Item.Meta
                                         key={item.id}
-                                        title={item.id}
-                                        description={item.name}
+                                        title={item.name}
+
                                     />
                                     {
                                         item.status ?

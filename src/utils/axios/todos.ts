@@ -39,3 +39,7 @@ export const apiUpdateTodo = (data: Todo) => {
     status: JSON.parse(status) || false,
   });
 };
+
+export const apiDeleteTodo = (id: string | number) => {
+  return axios.delete<{}>(`/todos/${id}`);
+};
